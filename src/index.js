@@ -4,7 +4,8 @@ import fs from "fs";
 import path from "path";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+  
 });
 
 client.commands = new Collection();
@@ -33,7 +34,7 @@ client.on("interactionCreate", async (interaction) => {
     } catch (err) {
       console.error(err);
       if (!interaction.replied) {
-        await interaction.reply({ content: "❌ An error occurred.", ephemeral: true });
+        await interaction.reply({ content: "An error occurred.", ephemeral: true });
       }
     }
   }
