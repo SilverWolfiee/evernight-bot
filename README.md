@@ -25,6 +25,6 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 Feel free to fork and open a pull request! Suggestions for new features are always welcome.
 
 ## requirement
-(node.js)[https://nodejs.org/]
+[node.js](https://nodejs.org)
 
 
