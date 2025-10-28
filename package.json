@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/SilverWolfiee/evernight-bot/issues"
   },
-  "homepage": "https://github.com/SilverWolfiee/evernight-bot#readme"
+  "homepage": "https://github.com/SilverWolfiee/evernight-bot#readme",
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.81"
+  }
 }

@@ -17,7 +17,15 @@ const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith(".js"))
 
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
-  const { command, execute } = await import(`file:///${filePath.replace(/\\/g, '/')}`);
+  const imported = await import(`file:///${filePath.replace(/\\/g, '/')}`);
+  const command = imported.command;
+  const execute = imported.execute;
+
+  if (!command?.name) {
+    console.warn(`⚠️ Skipping invalid command file: ${file}`);
+    continue;
+  }
+
   client.commands.set(command.name, { command, execute });
 }
 
@@ -39,5 +47,7 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 });
-
+process.on('unhandledRejection', (err) => {
+  console.error("Unhandled promise rejection:", err);
+});
 client.login(process.env.DISCORD_TOKEN);
