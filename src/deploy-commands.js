@@ -1,6 +1,5 @@
 import { REST, Routes } from "discord.js";
 import "dotenv/config";
-
 import { command as register } from "./commands/register.js";
 import { command as profile } from "./commands/profile.js";
 import { command as bet } from "./commands/bet.js";
@@ -10,8 +9,9 @@ import { command as gen } from "./commands/gen.js";
 import { command as help } from "./commands/help.js";
 import { command as gacha } from "./commands/gacha.js";
 import { command as inventory } from "./commands/inventory.js";
+import {command as ask} from "./commands/ask.js"
 
-const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory].map(cmd =>
+const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask].map(cmd =>
   cmd.toJSON()
 );
 

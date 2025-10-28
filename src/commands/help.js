@@ -16,7 +16,9 @@ export async function execute(interaction) {
             {name : "/leaderboard", value : "See Local/Global leaderboard", inline : false},
             {name : "/Profile", value : "See your Evernight Profile", inline : false},
             {name : "/Register", value : "Create Evernight Account", inline : false},
-            {name : "/gen", value : "Create your Demotivator meme", inline : false}
+            {name : "/Inventory", value : "Check your Lightcone/Character Invontory", inline : false},
+            {name : "/Gacha", value : "Embrace your thirst of gacha", inline : false},
+            
         )
         
         .setFooter({text : "♭ I know your past, the things you want to see ♭, to touch ♭, to know ♭"})

@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/SilverWolfiee/evernight-bot#readme",
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.81"
+    "@google/generative-ai": "^0.24.1",
+    "@napi-rs/canvas": "^0.1.81",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.7.0"
   }
 }
