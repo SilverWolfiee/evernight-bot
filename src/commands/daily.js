@@ -1,5 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { loadUsers, saveUsers } from "../../data/userdata.js";
+import { getTier, addXp } from "../utils/level_mgr.js";
+
 
 export const command = new SlashCommandBuilder()
     .setName("daily")
@@ -35,9 +37,20 @@ export async function execute(interactions) {
     })
     return;
   }
-  user.jades += 1600
-  user.credits += 10000
+  const baseCredits = 10000;
+  const baseJades = 1600;
+  const tier = getTier(user.level)
+  const creditMultiplier = 1 + tier * 0.5;
+  const jadeMultiplier = 1 + tier * 0.25;
+  const xpGain = Math.floor(1000 * Math.pow(1.08, user.level) * (1 + tier * 0.1));
+  const creditRewards = Math.floor(baseCredits * creditMultiplier)
+  const jadesRewards = Math.floor(baseJades * jadeMultiplier)
+
+  user.jades += jadesRewards
+  user.credits += creditRewards
   user.lastDaily = now.getTime();
+  const leveledUp = addXp(user, xpGain)
+
   const nextResetUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
   const nextResetLocal = nextResetUTC.toLocaleString(undefined, {
       hour: "2-digit",
@@ -47,10 +60,12 @@ export async function execute(interactions) {
   const embed = new EmbedBuilder()
     .setTitle("Daily Reward Claimed <:evernight_daily:1432392306387980451>")
     .addFields(
-      { name: "<:stellar_jade:1432377631210344530> Stellar Jades", value: "1600", inline: true },
-      { name: "<:credit:1432377745626759380> Credits", value: "10000", inline: true },
-      { name: "Next Reset", value: `${nextResetLocal}`, inline: true }
+      { name: "<:stellar_jade:1432377631210344530> Stellar Jades", value: `${jadesRewards}`, inline: true },
+      { name: "<:credit:1432377745626759380> Credits", value: `${creditRewards}`, inline: true },
+      { name: "XP Gained", value: `${xpGain}`, inline: true },
+      { name: "Current Level", value: `${user.level}`, inline: true },
+      { name: "Next Reset", value: `${nextResetLocal}`, inline: true },
     )
-    .setColor("#900c00");
+    .setColor(leveledUp ? "#00ff88" : "#900c00");
     await interactions.reply({ embeds: [embed] });
 }
