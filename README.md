@@ -10,6 +10,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - 🪙 **Head or Tail Bet** — Try your luck and win (or lose) your credits
 - 🏆 **Leaderboard** — View the top users globally or within your server.
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server
+- :robot: - GeminiAI support
 
 ---
 
