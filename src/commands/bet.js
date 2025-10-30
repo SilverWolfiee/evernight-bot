@@ -65,7 +65,7 @@ export async function execute(interaction) {
     let color;
 
     if (choice === result) {
-      const winnings = amount * 2;
+      const winnings = amount;
       user.credits += winnings;
       message = `🪙 The coin landed on **${result.toUpperCase()}!**\nYou won **${winnings} credits!** 🎉`;
       color = 0x00ff99;

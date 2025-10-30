@@ -10,8 +10,9 @@ import { command as help } from "./commands/help.js";
 import { command as gacha } from "./commands/gacha.js";
 import { command as inventory } from "./commands/inventory.js";
 import {command as ask} from "./commands/ask.js"
+import {command as blackjack} from "./commands/blackjack.js"
 
-const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask].map(cmd =>
+const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask, blackjack].map(cmd =>
   cmd.toJSON()
 );
 
@@ -29,7 +30,7 @@ const guilds = [process.env.GUILD_ID, "941190868235333692"];
         Routes.applicationGuildCommands(clientId, guildId),
         { body: commands }
       );
-      console.log(`✅ Commands registered in guild ${guildId}`);
+      console.log(`Commands registered in guild ${guildId}`);
     }
 
     console.log("Registering global commands (optional)...");

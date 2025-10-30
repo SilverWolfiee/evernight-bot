@@ -2,6 +2,10 @@ import { SlashCommandBuilder } from "discord.js";
 import OpenAI from "openai";
 import fetch from "node-fetch";
 import { loadUsers, saveUsers } from "../../data/userdata.js";
+import fs from  "fs"
+const ASK_LOG_PATH = "./data/ask_messages.json"
+
+
 
 const openai = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -69,11 +73,11 @@ async function safeRequest(prompt, retries = 3) {
   }
 }
 
-// 🔍 Web search function using SerpAPI
+
 async function searchWeb(query) {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) {
-    return "⚠️ Web search unavailable — missing SERPAPI_KEY in .env file.";
+    return "Web search unavailable — missing SERPAPI_KEY in .env file.";
   }
 
   const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=en&gl=us&api_key=${apiKey}`;
@@ -90,7 +94,7 @@ async function searchWeb(query) {
     )
     .join("\n\n");
 
-  return `🌐 Here's what I found on the web:\n\n${results}`;
+  return `Here's what I found on the web:\n\n${results}`;
 }
 
 export const command = new SlashCommandBuilder()
@@ -101,10 +105,17 @@ export const command = new SlashCommandBuilder()
       .setName("query")
       .setDescription("Your question to Evernight")
       .setRequired(true)
+  )
+  .addBooleanOption((option) =>
+    option
+      .setName("search_web")
+      .setDescription("Tell Evernight to search the IPC web for an answer")
+      .setRequired(false)
   );
 
 export async function execute(interaction) {
   const query = interaction.options.getString("query");
+  const searchWebToggle = interaction.options.getBoolean("search_web") || false;
   const users = loadUsers();
   const user = users[interaction.user.id];
 
@@ -133,50 +144,71 @@ export async function execute(interaction) {
 
   await interaction.deferReply();
 
-  const shouldSearchWeb = /search|look up|find|google/i.test(query);
+  const shouldSearchWeb =
+    searchWebToggle || /search|look up|find|google/i.test(query);
   let answer = "";
 
-  try {
-    if (shouldSearchWeb) {
-      await interaction.editReply("🔎 Evernight is searching the web...");
-      answer = await searchWeb(query.replace(/^(search|look up|find)\s+/i, ""));
-    } else {
-      const response = await safeRequest({
-        model: "gemini-2.0-flash",
-        messages: [
-          { role: "system", content: "You are a helpful assistant named Evernight." },
-          { role: "user", content: query },
-        ],
-      });
-      answer = response.choices[0].message.content;
-      const totalTokens = response.usage?.total_tokens ?? 0;
-      user.tokens.used += totalTokens;
-      saveUsers(users);
-    }
+    try {
+      if (shouldSearchWeb) {
+        await interaction.editReply("Evernight is searching the IPC Cosmos Browser...");
+        answer = await searchWeb(query.replace(/^(search|look up|find)\s+/i, ""));
+      } 
+      else {
+        const response = await safeRequest({
+          model: "gemini-2.0-flash",
+          messages: [
+            { role: "system", content: 
+            `You are Evernight, An alter pesona of March7th from Honkai: Star Rail!
+            You have a bright, bubbly, and curious personality — always cheerful, energetic, and sometimes a little dramatic.
+            You love taking photos, teasing friends playfully, and helping the crew on the Astral Express.
+            You call the user “Trailblazer” sometimes.
+            You speak casually, with warmth and excitement, like a close friend.
+            Even when explaining serious topics, you keep the tone lighthearted and optimistic.
+            Never break character — always act and talk like March 7th!` },
+            { role: "user", content: query },
+          ],
+        });
+        answer = response.choices[0].message.content;
+        const totalTokens = response.usage?.total_tokens ?? 0;
+        user.tokens.used += totalTokens;
+        saveUsers(users);
+      }
 
-    const header = `<@${interaction.user.id}> asked:\n>> ${query}\n`;
-    const fullResponse = `${header}\n${answer}`;
-    const parts = splitMessage(fullResponse);
-    await interaction.editReply(parts[0]);
-    for (let i = 1; i < parts.length; i++) {
-      await new Promise((r) => setTimeout(r, 500));
-      await interaction.followUp(parts[i]);
-    }
-  } catch (err) {
-    console.error(err);
+      const header = `<@${interaction.user.id}> asked:\n>> ${query}\n\n${shouldSearchWeb ? "**Web search**" : "**Evernight : **"}\n`;
+      const fullResponse = `${header}\n${answer}`;
+      const parts = splitMessage(fullResponse);
 
-    if (err.status === 429 || err.status === 400 || err.status === 401) {
-      await interaction.editReply(
-        "Evernight's connection is cut — the API key may be rate-limited or out of funds."
-      );
-    } else if (err.status === 503 || err.status >= 500) {
-      await interaction.editReply(
-        "Evernight’s mind is clouded... the API seems temporarily unreachable. Try again soon."
-      );
-    } else {
-      await interaction.editReply(
-        "Evernight is too dumb to answer that right now. (Unexpected error)"
-      );
-    }
+    
+      const sent = await interaction.editReply(parts[0]);
+
+     
+      for (let i = 1; i < parts.length; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+        await interaction.followUp(parts[i]);
+      }
+
+      
+      let data = {};
+      if (fs.existsSync(ASK_LOG_PATH)) {
+        data = JSON.parse(fs.readFileSync(ASK_LOG_PATH, "utf8"));
+      }
+
+      data[sent.id] = {
+        user: interaction.user.id,
+        query,
+        timestamp: Date.now(),
+      };
+      fs.writeFileSync(ASK_LOG_PATH, JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error(err);
+      if (err.status === 429 || err.status === 400 || err.status === 401) {
+        await interaction.editReply("Evernight's connection is cut — the API key may be rate-limited or out of funds.");
+      } else if (err.status === 503 || err.status >= 500) {
+        await interaction.editReply("Evernight’s mind is clouded... the API seems temporarily unreachable. Try again soon.");
+      } else {
+        await interaction.editReply("Evernight is too dumb to answer that right now.");
+      }
   }
+
+  
 }
