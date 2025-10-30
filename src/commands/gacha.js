@@ -4,7 +4,7 @@ const { createCanvas, loadImage } = pkg;
 import { loadUsers, saveUsers } from "../../data/userdata.js";
 import fs from "fs";
 
-const featuredFiveStar = "Evernight";
+const featuredFiveStar = "Dan Heng Permansor Terrae";
 
 const fiveStars = [
   "Acheron","Argenti","Aglaea","Anaxa","Archer","Aventurine","Bailu","Black Swan","Blade",
@@ -53,7 +53,7 @@ export const command = new SlashCommandBuilder()
       .setRequired(true)
   );
 
-// helper functions for inventory
+
 function addCharacterToInventory(user, characterName) {
   if (!user.inventory) user.inventory = { characters: {}, lightCones: {} };
   if (!user.inventory.characters[characterName]) user.inventory.characters[characterName] = 0;
@@ -85,7 +85,7 @@ export async function execute(interaction) {
   if (user.jades < cost) {
     const stickerImage = new AttachmentBuilder("./assets/evernight_tail.png");
     await interaction.reply({
-      content: "💸 Aww you're too poor!",
+      content: "Aww you're too poor!",
       files: [stickerImage],
     });
     return;
@@ -151,17 +151,33 @@ export async function execute(interaction) {
   saveUsers(users);
 
   const images = [];
+
   for (const p of pulls) {
-    let safeName = p.item.replace(/[^a-zA-Z0-9_\- ]/g, "");
-    let filename = type === "character"
-      ? `./assets/character/${safeName}.png`
-      : `./assets/lightcone/${safeName}.png`;
+      let filename;
 
-    if (p.item.toLowerCase().includes("meshing cogs")) filename = "./assets/lightcone/meshingcogs.png";
-    if (!fs.existsSync(filename)) filename = "./assets/character/Evernight.png";
+      if (p.item.toLowerCase().includes("meshing cogs")) {
+          filename = "./assets/lightcone/meshingcogs.png";
+      } else {
+          const folder = type === "character" ? "./assets/character" : "./assets/lightcone";
+          const files = fs.readdirSync(folder);
 
-    images.push({ path: filename, rarity: p.rarity });
+          const normalizedItem = p.item.trim().toLowerCase().replace(/\s+/g, " ");
+          const match = files.find(f => {
+              const baseName = f.replace(/\.png$/i, "").trim().toLowerCase().replace(/\s+/g, " ");
+              return baseName === normalizedItem;
+          });
+
+          if (match) {
+              filename = `${folder}/${match}`;
+          } else {
+              filename = "./assets/character/Evernight.png";
+          }
+      }
+
+      images.push({ path: filename, rarity: p.rarity });
   }
+
+
 
   const tileSize = 640;
   const cols = 5;
@@ -186,14 +202,18 @@ export async function execute(interaction) {
 
   const buffer = canvas.toBuffer("image/png");
   const file = new AttachmentBuilder(buffer, { name: "gacha_result.png" });
-
+  const displayName = interaction.member?.nickname || interaction.user.username;
   const results = pulls.map(p => `${p.rarity}★ ${p.item}`).join("\n");
-  const embed = new EmbedBuilder()
-    .setTitle(`${interaction.user.username}'s ${amount}× ${type} pulls`)
-    .setDescription(results)
-    .setColor(highestRarity === 5 ? 0xFFD700 : highestRarity === 4 ? 0xAA6CFF : 0xAAAAAA)
-    .setImage("attachment://gacha_result.png")
-    .setFooter({ text: `Remaining Jades: ${user.jades} | Pity: ${user.pity}` });
-
+ const embed = new EmbedBuilder()
+      .setTitle(`${displayName}'s ${amount}× ${type} pulls <:evernight_dog:1432386535520731166>`)
+      .setDescription(results)
+      .setColor(highestRarity === 5 ? 0xFFD700 : highestRarity === 4 ? 0xAA6CFF : 0xAAAAAA)
+      .addFields(
+          { name: "Current Banner", value: `**${featuredFiveStar}**`, inline: false },
+          { name: "Remaining Jades<:stellar_jade:1432377631210344530>", value: `${user.jades}`, inline: true },
+          { name: "Pity ⭐ ", value: `${user.pity}`, inline: true }
+      )
+      .setImage("attachment://gacha_result.png")
+      .setFooter({ text: `${displayName} • ${type} banner` });
   await interaction.editReply({ embeds: [embed], files: [file] });
 }
