@@ -18,6 +18,8 @@ export async function execute(interaction) {
             {name : "/Register", value : "Create Evernight Account", inline : false},
             {name : "/Inventory", value : "Check your Lightcone/Character Invontory", inline : false},
             {name : "/Gacha", value : "Embrace your thirst of gacha", inline : false},
+            {name : "/Gen", value : "Generate a demotivator meme", inline : false},
+            {name : "/Blackjack", value : "Play Blackjack with Evernight(Multiplayer is still WIP)", inline : false},
             
         )
         
