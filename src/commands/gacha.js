@@ -4,7 +4,7 @@ const { createCanvas, loadImage } = pkg;
 import { loadUsers, saveUsers } from "../../data/userdata.js";
 import fs from "fs";
 
-const featuredFiveStar = "Dan Heng Permansor Terrae";
+const featuredFiveStar = "Cyrene";
 
 const fiveStars = [
   "Acheron","Argenti","Aglaea","Anaxa","Archer","Aventurine","Bailu","Black Swan","Blade",
