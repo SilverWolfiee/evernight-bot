@@ -51,7 +51,8 @@ export async function execute(interaction) {
       { name: "XP", value: `${user.xp} / ${xpToNext}`, inline: true },
       { name: "Progress", value: progressBar },
       { name: "Credits <:credit:1432377745626759380>", value: `${user.credits}`, inline: true },
-      { name: "Jades <:stellar_jade:1432377631210344530>", value: `${user.jades}`, inline: true }
+      { name: "Jades <:stellar_jade:1432377631210344530>", value: `${user.jades}`, inline: true },
+      { name: "Power <:power:1434577803013259425>", value: `${user.power}/300`, inline: true },
     );
 
   await interaction.reply({ embeds: [embed] });

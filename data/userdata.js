@@ -1,6 +1,11 @@
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const filePath = "./data/users.json";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const filePath = path.resolve(__dirname, "../data/users.json");
 
 export function loadUsers() {
   if (!fs.existsSync(filePath)) {
@@ -9,10 +14,21 @@ export function loadUsers() {
 
   const users = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
- 
   let updated = false;
   for (const id in users) {
     const user = users[id];
+    if (!user.stats) {
+      console.log(`Patching stats for user ${id}`);
+      user.stats = {
+        atk: 20,
+        def: 10,
+        maxHP: 100,
+        critRate: 0.05,
+        critDmg: 1.5,
+        spd : 96
+      };
+      updated = true;
+    }
     if (user.xp === undefined) {
       user.xp = 0;
       updated = true;
@@ -21,12 +37,16 @@ export function loadUsers() {
       user.level = 1;
       updated = true;
     }
+    if (user.power === undefined) {
+      user.power = 300;
+      user.lastPowerUpdate = Date.now();
+      updated = true;
+    }
   }
 
-
   if (updated) {
+    console.log("Users patched, writing file.");
     fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
-    console.log("Patched legacy users with missing XP/level fields.");
   }
 
   return users;
@@ -47,7 +67,17 @@ export function checkUser(userId) {
       xp: 0,
       level: 1,
       registeredAt: new Date().toISOString(),
+      power: 300,
+      lastPowerUpdate: Date.now(),
       lastDaily: 0,
+      stats: {
+        atk: 20,
+        def: 10,
+        maxHP: 100,
+        critRate: 0.05,
+        critDmg: 1.5,
+        spd : 96
+      }
     };
     saveUsers(users);
   }

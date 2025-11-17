@@ -11,8 +11,9 @@ import { command as gacha } from "./commands/gacha.js";
 import { command as inventory } from "./commands/inventory.js";
 import {command as ask} from "./commands/ask.js"
 import {command as blackjack} from "./commands/blackjack.js"
+import {command as adventure} from "./commands/adventure.js"
 
-const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask, blackjack].map(cmd =>
+const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask, blackjack, adventure].map(cmd =>
   cmd.toJSON()
 );
 

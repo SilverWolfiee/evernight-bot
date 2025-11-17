@@ -131,7 +131,7 @@ export class BlackjackGame {
           new ButtonBuilder().setCustomId("stand").setLabel("Stand").setStyle(ButtonStyle.Secondary).setDisabled(true)
         );
         await gameMsg.edit({
-          content: `⏰ Time's up for <@${this.userId}>'s game!`,
+          content: `Time's up for <@${this.userId}>'s game!`,
           components: [disabledRow],
         });
       }

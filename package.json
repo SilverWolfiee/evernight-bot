@@ -20,7 +20,9 @@
   "homepage": "https://github.com/SilverWolfiee/evernight-bot#readme",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@napi-rs/canvas": "^0.1.81",
+    "@napi-rs/canvas": "^0.1.82",
+    "discord.js": "^14.24.2",
+    "dotenv": "^17.2.3",
     "node-fetch": "^3.3.2",
     "openai": "^6.7.0"
   }

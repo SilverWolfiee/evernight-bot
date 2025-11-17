@@ -4,6 +4,11 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 import { splitMessage } from "./utils/splitMessage.js";
+import { autoRegeneratePower } from "./utils/power.js";
+import { loadUsers } from "../data/userdata.js";
+import { battleInteraction } from "./utils/battle_mgr.js";
+
+
 
 const ASK_LOG_PATH = path.join(process.cwd(), "data", "ask_messages.json");
 const client = new Client({
@@ -40,7 +45,12 @@ for (const file of commandFiles) {
   }
 }
 
-client.once("ready", () => console.log(`Logged in as ${client.user.tag}`));
+
+client.once("ready", () => {
+  console.log(`Logged in as ${client.user.tag}`);
+  autoRegeneratePower();
+});
+
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand()) {
@@ -55,13 +65,20 @@ client.on("interactionCreate", async (interaction) => {
         }
       }
     }
+    return; 
   }
 
-  else if (interaction.isButton() && interaction.customId.startsWith("bj_")) {
+  if (interaction.isButton() && interaction.customId.startsWith("bj_")) {
     const { handleBlackjackButton } = await import("./utils/blackjackGame.js");
-    await handleBlackjackButton(interaction);
+    return await handleBlackjackButton(interaction);
   }
+  if (interaction.isButton() && ["atk","skill","ult","run"].includes(interaction.customId)) {
+    const { handleBattleButton } = await import("../data/battle.js"); 
+    return handleBattleButton(interaction)
+  }
+  await battleInteraction(interaction);
 });
+
 
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled promise rejection:", err);
@@ -124,6 +141,7 @@ client.on("messageCreate", async (message) => {
       break;
     }
   }
+  
 });
 
 async function generateFollowUpResponses(originalQuery, userReply) {
@@ -161,5 +179,5 @@ async function generateFollowUpResponses(originalQuery, userReply) {
     return "Evernight is frozen in Amphoreus — she can’t answer that right now!";
   }
 }
-
+loadUsers()
 client.login(process.env.DISCORD_TOKEN);
