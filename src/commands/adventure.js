@@ -19,9 +19,8 @@ export async function execute(interaction) {
     const user = users[userId];
 
 
-    if (!user.rpg) {
-        user.rpg = { hp: user.stats.maxHp, atk: user.stats.atk, def: user.stats.def };
-    }
+    user.rpg = { hp: user.stats.maxHp, atk: user.stats.atk, def: user.stats.def };
+
     if (!user.session) {
         user.session = {
             inBattle: false,

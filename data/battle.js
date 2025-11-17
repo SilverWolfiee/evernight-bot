@@ -219,7 +219,7 @@ export async function handleBattleButton(interaction) {
     const scaledCredits = Math.floor(rewards.credits * (1 + user.level * 0.12));
     const scaledJades = Math.floor(rewards.jades * (1 + user.level * 0.06));
     const tier = getTier(user.level);
-    const xpGain = Math.floor(1000 * Math.pow(1.09, user.level) * (1 + tier * 0.12) * 0.25);
+    const xpGain = Math.floor(1000 * Math.pow(1.09, user.level) * (1 + tier * 0.20) * 0.25);
 
     user.credits += scaledCredits;
     user.jades += scaledJades;
@@ -250,33 +250,33 @@ export async function handleBattleButton(interaction) {
 
   const row = new ActionRowBuilder().addComponents(actionRowButtons());
   return interaction.update({
-    content: `${battle.staticHeader}\n\n**Battle Info:**\n${battle.battleInfo}\n\n**Battle Message:**\n${battle.battleMessage}`,
-    components: [row]
+      content: `${battle.staticHeader}\n\n**Battle Info:**\n${battle.battleInfo}\n\n**Battle Message:**\n${battle.battleMessage}`,
+      components: [row]
   });
 }
 
 function calculateEnemyDamage(battle, diff, userLevel) {
-  const enemy = battle.enemy;
-  const playerDef = battle.player.def || 0;
+    const enemy = battle.enemy;
+    const playerDef = battle.player.def || 0;
 
-  const diffMult = DIFF_MULT[diff] ?? 1.0;
+    const diffMult = DIFF_MULT[diff] ?? 1.0;
 
-  const critChance = typeof enemy.critRate === 'number' ? enemy.critRate : 0.12;
-  const critDmgMult = typeof enemy.critDmg === 'number' ? enemy.critDmg : 1.5;
+    const critChance = typeof enemy.critRate === 'number' ? enemy.critRate : 0.12;
+    const critDmgMult = typeof enemy.critDmg === 'number' ? enemy.critDmg : 1.5;
 
-  const atkScaled = enemy.atk * (1 + 0.15 * (Math.max(1, userLevel) - 1));
+    const atkScaled = enemy.atk * (1 + 0.15 * (Math.max(1, userLevel) - 1));
 
-  const isCrit = Math.random() < critChance;
-  let base = isCrit ? atkScaled * critDmgMult : atkScaled;
+    const isCrit = Math.random() < critChance;
+    let base = isCrit ? atkScaled * critDmgMult : atkScaled;
 
-  base *= diffMult;
-  base -= playerDef;
+    base *= diffMult;
+    base -= playerDef;
 
-  const minDamage = diff === 'easy' ? 8 : diff === 'medium' ? 12 : 20;
-  if (base < minDamage) base = minDamage;
-  if (base < 0) base = 0;
+    const minDamage = diff === 'easy' ? 8 : diff === 'medium' ? 12 : 20;
+    if (base < minDamage) base = minDamage;
+    if (base < 0) base = 0;
 
-  return Math.floor(base);
+    return Math.floor(base);
 }
 
 export { battles };
