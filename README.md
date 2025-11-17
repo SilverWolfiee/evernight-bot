@@ -13,7 +13,6 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - 🎲 **HSR Gacha System** — Pull for characters.
 - 🛒 **Shop System** — Spend your earnings on fun items or upgrades.
 - **RPG Adventure Mode** - Play a turnbase games to earn more jades.
-- 🎲 **HSR Gacha System** — Pull for Lightcones.
 - ♠️ **Blackjack with Friends** — Play against your friend in blackjack.
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server.
 - :robot: - GeminiAI support.
@@ -23,7 +22,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 ## 🧩 Upcoming Features
 - Properly implement hard difficulty with unique enemies for RPG mode
 - fix and rebalance some scalings in RPG mode
-
+- Lightcone Gacha(When Cyrene Ults)
 ---
 
 ## 🤝 Contributing
