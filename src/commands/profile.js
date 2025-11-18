@@ -53,6 +53,10 @@ export async function execute(interaction) {
       { name: "Credits <:credit:1432377745626759380>", value: `${user.credits}`, inline: true },
       { name: "Jades <:stellar_jade:1432377631210344530>", value: `${user.jades}`, inline: true },
       { name: "Power <:power:1434577803013259425>", value: `${user.power}/300`, inline: true },
+      { name: "MaxHP", value: `${user.stats.maxHP}`, inline: true },
+      { name: "Atk", value: `${user.stats.atk}`, inline: true },
+      { name: "Spd", value: `${user.stats.spd}`, inline: true },
+      { name: "Def", value: `${user.stats.def}`, inline: true },
     );
 
   await interaction.reply({ embeds: [embed] });
