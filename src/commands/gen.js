@@ -1,7 +1,21 @@
 import { SlashCommandBuilder, AttachmentBuilder } from "discord.js";
-import pkg from "@napi-rs/canvas";
+import pkg, {GlobalFonts} from "@napi-rs/canvas";
+import os from "os";
 const { createCanvas, loadImage } = pkg;
 
+if (os.platform() === "linux") {
+  try {
+    GlobalFonts.registerFromPath(
+      "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
+      "Noto Color Emoji"
+    );
+    console.log("✔ Loaded Noto Color Emoji (Linux)")
+  } catch (e) {
+    console.warn("⚠ Could not load Noto Emoji font:", e);
+  }
+} else {
+  console.log("ℹ Running on Windows - using system emoji font");
+}
 export const command = new SlashCommandBuilder()
   .setName("gen")
   .setDescription("Generate a demotivator meme")
@@ -37,8 +51,7 @@ export async function execute(interaction) {
     ctx.lineWidth = 4;
     ctx.strokeRect(50, 50, 700, 600);
     ctx.drawImage(img, 60, 60, 680, 580);
-
-    ctx.font = "bold 46px Georgia";
+    ctx.font = '46px "Noto Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Georgia';
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
