@@ -6,16 +6,21 @@ const { createCanvas, loadImage } = pkg;
 if (os.platform() === "linux") {
   try {
     GlobalFonts.registerFromPath(
-      "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
+      "/usr/share/fonts/TTF/DejaVuSerif.ttf",
+      "DejaVu Serif"
+    );
+    GlobalFonts.registerFromPath(
+      "/usr/share/fonts/noto/NotoColorEmoji.ttf",
       "Noto Color Emoji"
     );
-    console.log("✔ Loaded Noto Color Emoji (Linux)")
+    console.log("Loaded DejaVu + Noto Emoji fonts (Linux)");
   } catch (e) {
-    console.warn("⚠ Could not load Noto Emoji font:", e);
+    console.warn("Could not load fonts:", e);
   }
 } else {
-  console.log("ℹ Running on Windows - using system emoji font");
+  console.log("Running on Windows - using system fonts");
 }
+
 export const command = new SlashCommandBuilder()
   .setName("gen")
   .setDescription("Generate a demotivator meme")
@@ -38,7 +43,7 @@ export async function execute(interaction) {
       try {
         img = await loadImage(imageUrl);
       } catch (e) {
-        console.error("❌ Failed to load image:", e);
+        console.error("Failed to load image:", e);
         return await interaction.editReply("Failed to load image.");
       };
 
@@ -51,7 +56,7 @@ export async function execute(interaction) {
     ctx.lineWidth = 4;
     ctx.strokeRect(50, 50, 700, 600);
     ctx.drawImage(img, 60, 60, 680, 580);
-    ctx.font = '46px "Noto Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Georgia';
+    ctx.font = '46px "DejaVu Serif", Georgia, "Noto Color Emoji", "Segoe UI Emoji"';
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
