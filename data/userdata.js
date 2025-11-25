@@ -1,11 +1,17 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import os from "os"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const filePath = path.resolve(__dirname, "../data/users.json");
+let filePath
+if(os.platform() === "win32"){
+  filePath = "C:\\Users\\EnDragyy\\evernight-database\\users.json"
+}
+else{
+  filePath= "/home/silverwolf/Windows/Users/EnDragyy/evernight-database/users.json"
+}
 
 export function loadUsers() {
   if (!fs.existsSync(filePath)) {
