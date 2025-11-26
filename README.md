@@ -1,7 +1,7 @@
-# 🌙 Evernight Bot
+# Evernight Bot
 
 A simple Discord bot built with **discord.js**, featuring daily rewards, betting, and leaderboard systems — with more features coming soon!
-
+![March Melet](assets/march-melet.png)
 ---
 
 ## ✨ Features
@@ -16,6 +16,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - ♠️ **Blackjack with Friends** — Play against your friend in blackjack.
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server.
 - :robot: - GeminiAI support.
+- ChatguardAPI by [Cedrugs](https://github.com/cedrugs) implementation
 
 ---
 
@@ -32,6 +33,7 @@ Feel free to fork and open a pull request! Suggestions for new features are alwa
 [node.js](https://nodejs.org)
 
 ## extra notes
+### self hosting 
 If you want to self host, you need to modify the file path according to your pc as currently it is hardcoded to match mine.
 
 ```
@@ -43,3 +45,6 @@ else{
 }
 ```
 you need to modify this part here
+### chatguard usage
+You need to give Evernight admin permissions for chatguard to work properly.
+Without admin perms, she won't be able to delete offensive message
