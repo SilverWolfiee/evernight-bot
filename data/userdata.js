@@ -1,10 +1,10 @@
 import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+// import path from "path";
+// import { fileURLToPath } from "url";
 import os from "os"
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+//const __filename = fileURLToPath(import.meta.url);
+//const __dirname = path.dirname(__filename);
 let filePath
 if(os.platform() === "win32"){
   filePath = "C:\\Users\\EnDragyy\\evernight-database\\users.json"

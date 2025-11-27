@@ -41,7 +41,7 @@ export const enemies = {
     hard: [
         { name: "Abundance Sprite: Malefic Ape", hp: 100, atk: 18, def: 6, spd: 135 },
         { name: "Bronya", hp: 120, atk: 20, def: 8, spd: 132 },
-        { name: "Cocolia's Echo", hp: 130, atk: 22, def: 10, spd: 95 }
+        { name: "Cocolia's Echo", hp: 130, atk: 22, def: 10, spd: 115 }
     ]
 };
 

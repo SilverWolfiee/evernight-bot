@@ -4,3 +4,5 @@ characterlist.txt
 data/ask_messages.json
 start.bat
 node_modules/
+src/utils/osuapi.js
+src/commands/recent.js
