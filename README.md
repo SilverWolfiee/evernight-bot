@@ -16,8 +16,8 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - ♠️ **Blackjack with Friends** — Play against your friend in blackjack.
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server.
 - :robot: - GeminiAI support.
-- ChatguardAPI by [Cedrugs](https://github.com/cedrugs)
-[chatguardAPI](https://github.com/cedrugs/Chatguard-API)
+- [chatguardAPI](https://github.com/cedrugs/Chatguard-API) by [Cedrugs](https://github.com/cedrugs)
+
 
 ---
 
