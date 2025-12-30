@@ -15,6 +15,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - **RPG Adventure Mode** - Play a turnbase games to earn more jades.
 - ♠️ **Blackjack with Friends** — Play against your friend in blackjack.
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server.
+- github linking and github profile flexing
 - :robot: - GeminiAI support.
 - [chatguardAPI](https://github.com/cedrugs/Chatguard-API) by [Cedrugs](https://github.com/cedrugs)
 
@@ -36,6 +37,7 @@ Feel free to fork and open a pull request! Suggestions for new features are alwa
 ## extra notes
 ### self hosting 
 If you want to self host, you need to modify the file path according to your pc as currently it is hardcoded to match mine.
+also you will need a backend server [elysia-evernight](https://github.com/SilverWolfiee/elysia-evernight)
 
 ```
 if(os.platform() === "win32"){
