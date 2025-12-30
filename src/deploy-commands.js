@@ -13,9 +13,10 @@ import {command as ask} from "./commands/ask.js"
 import {command as blackjack} from "./commands/blackjack.js"
 import {command as adventure} from "./commands/adventure.js"
 import {command as shop} from "./commands/shop.js"
+import {command as linkgithub} from  "./commands/linkgithub.js"
 // import {command as recent} from "./commands/recent.js"
 
-const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha, inventory, ask, blackjack, adventure, shop].map(cmd =>
+const commands = [register, profile, bet, daily, leaderboard, gen, help, gacha,linkgithub, inventory, ask, blackjack, adventure, shop].map(cmd =>
   cmd.toJSON()
 );
 

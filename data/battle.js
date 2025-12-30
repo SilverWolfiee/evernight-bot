@@ -38,7 +38,7 @@ function scaleEnemyStats(baseEnemy, playerLevel, diff){
   scaled.def = Math.floor(safeBase.def * Math.pow(DEF_GROWTH, L - 1) * diffMult)
   scaled.spd = Math.floor(safeBase.spd * Math.pow(SPD_GROWTH, L - 1) * diffMult)
   if(typeof safeBase.critRate === "number"){
-    scaled.critRate = Math.min(CRIT_DMG_CAP, safeBase.critRate + CRIT_RATE_PER_LEVEL)*(L-1)
+    scaled.critRate = Math.min(CRIT_RATE_CAP, safeBase.critRate + CRIT_RATE_PER_LEVEL)*(L-1)
   }
   if (typeof safeBase.critDmg === "number") {
     scaled.critDmg = Math.min(
@@ -370,7 +370,7 @@ export async function handleBattleButton(interaction) {
   });
 }
 
-function calculateEnemyDamage(battle, diff, userLevel) {
+function calculateEnemyDamage(battle, diff) {
   const enemy = battle.enemy;
   const playerDef = battle.player.def || 0;
   const diffMult = DIFF_MULT[diff] ?? 1.0;
