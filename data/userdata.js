@@ -87,6 +87,52 @@ export function checkUser(userId) {
     };
     saveUsers(users);
   }
-
+  
   return users[userId];
+}
+export function linkGithub(userId, githubData) {
+  const users = loadUsers();
+  if (!users[userId]) {
+    console.error(`[DATABASE] Tried to link GitHub for non-existent user: ${userId}`);
+    return false;
+  } 
+  users[userId].github = {
+    id: githubData.id,
+    username: githubData.username,
+    avatar: githubData.avatar || githubData.avatar_url,
+    profileUrl: githubData.profileUrl || githubData.html_url,
+    linkedAt: new Date().toISOString(),
+    repos: githubData.repos || 0,
+    followers: githubData.followers || 0,
+    following: githubData.following || 0,
+    bio: githubData.bio || "No bio set."
+  };
+
+  saveUsers(users);
+  console.log(`Linked GitHub account (${githubData.username}) to User ${userId}`);
+  return true;
+}
+export function linkosu(userId, osuData){
+  const users = loadUsers()
+  if(!users[userId]){
+    console.error(`User ${userId} Not found`)
+    return false;
+  }
+  users[userId].osu = {
+    id: osuData.id,
+    username: osuData.username,
+    avatar: osuData.avatar,
+    cover: osuData.cover,        
+    country: osuData.country,     
+    pp: osuData.pp,              
+    globalRank: osuData.globalRank,
+    countryRank: osuData.countryRank,
+    accuracy: osuData.accuracy,  
+    playCount: osuData.playCount,
+    mode: osuData.mode,           
+    linkedAt: osuData.linkedAt,
+  };
+  saveUsers(users)
+  console.log(`Linked Osu account ${osuData.username}`)
+  return true;
 }

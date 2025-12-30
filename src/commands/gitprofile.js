@@ -1,54 +1,43 @@
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import { loadUsers } from "../../data/userdata.js";
 
 export const command = new SlashCommandBuilder()
-    .setName("gitprofile")
-    .setDescription("Flex your git profile on this server")
+  .setName("gitprofile")
+  .setDescription("View your linked GitHub profile stats.");
 
 export async function execute(interaction) {
-    const userId = interaction.user.id;
-    await interaction.deferReply()
-    try{
-        const res = await fetch(`http://localhost:21000/user/${userId}`)
-        if(res.status===404){
-            return interaction.editReply({content : "I've checked my database and i can't seem to find you"})
-        }
-        if(!res.ok){
-            throw new Error (`Elysia Responded with : ${res.status}`)
-        }
-        const userdata = await res.json()
-        if (!userdata.github || !userdata.github.username) {
-            return interaction.editReply({
-                content: "Hey! You haven't linked your GitHub yet!"
-            });
-        }
-        const {username} = userdata.github
-        const githubres = await fetch(`https://api.github.com/users/${username}`)
-        if(!githubres.ok){
-            return interaction.editReply("Github didn't respond to me")
-        }
-        const gitProfile = await githubres.json()
-        const embed = new EmbedBuilder()
-        .setColor('#b52700') 
-            .setTitle(`${gitProfile.name || gitProfile.login}'s GitHub Profile`)
-            .setURL(gitProfile.html_url)
-            .setThumbnail(gitProfile.avatar_url)
-            .setDescription(gitProfile.bio || "No bio set... Even i wasn't this Mysterious!")
-            .addFields(
-                { name: 'Repos', value: `${gitProfile.public_repos}`, inline: true },
-                { name: 'Followers', value: `${gitProfile.followers}`, inline: true },
-                { name: 'Following', value: `${gitProfile.following}`, inline: true },
-                { name: 'Joined', value: `<t:${Math.floor(new Date(gitProfile.created_at).getTime() / 1000)}:R>`, inline: false }
-            )
-            .setFooter({ text: "Evernight's Database • Obtained via Elysia" })
-            .setTimestamp();
+  try {
+    const users = loadUsers();
+    const user = users[interaction.user.id];
 
-        await interaction.editReply({ embeds: [embed] });
-
-    } catch (error) {
-        console.error("Error in gitprofile:", error);
-       
-        await interaction.editReply({ content: "Oops! Something tripped me up while fetching your data. Try again later!" });
+    if (!user || !user.github) {
+      return interaction.reply({
+        content: "📸 **Hold up!** You haven't linked your GitHub yet. Use `/linkgithub` first!",
+        ephemeral: true
+      });
     }
-    
-    
+
+    const gh = user.github;
+    const dateLinked = Math.floor(new Date(gh.linkedAt).getTime() / 1000);
+
+    const embed = new EmbedBuilder()
+      .setTitle(`🐙 ${gh.username}'s GitHub`)
+      .setURL(gh.profileUrl)
+      .setDescription(gh.bio || "No bio available.")
+      .setThumbnail(gh.avatar)
+      .setColor(0x8B0000) 
+      .addFields(
+        { name: "📂 Repositories", value: `${gh.repos}`, inline: true },
+        { name: "👥 Followers", value: `${gh.followers}`, inline: true },
+        { name: "👣 Following", value: `${gh.following}`, inline: true },
+        { name: "🔗 Linked Since", value: `<t:${dateLinked}:R>`, inline: false }
+      )
+      .setFooter({ text: "Verified via Evernight OAuth", iconURL: interaction.client.user.displayAvatarURL() });
+
+    await interaction.reply({ embeds: [embed] });
+
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: "Camera jammed!", ephemeral: true });
+  }
 }
