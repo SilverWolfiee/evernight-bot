@@ -6,4 +6,4 @@ start.bat
 node_modules/
 data/database.js
 src/utils/osuapi.js
-src/commands/recent.js
+

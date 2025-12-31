@@ -17,9 +17,9 @@ import {command as linkgithub} from  "./commands/linkgithub.js"
 import {command as gitprofile} from "./commands/gitprofile.js"
 import {command as linkosu} from "./commands/linkosu.js"
 import {command as osu} from "./commands/osu.js"
-// import {command as recent} from "./commands/recent.js"
+import {command as recent} from "./commands/recent.js"
 
-const commands = [register, profile, bet, daily, leaderboard, gitprofile, linkosu, osu, gen, help, gacha,linkgithub, inventory, ask, blackjack, adventure, shop].map(cmd =>
+const commands = [register, profile, bet, daily, leaderboard, gitprofile, linkosu, osu, recent, gen, help, gacha,linkgithub, inventory, ask, blackjack, adventure, shop].map(cmd =>
   cmd.toJSON()
 );
 
