@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { promises as fs } from "fs";
-
+import { loadUsers } from "../../data/userdata.js";
 export const command = new SlashCommandBuilder()
   .setName("leaderboard")
   .setDescription("View leaderboard by Jades, Credits, or Level")
@@ -32,8 +32,8 @@ export async function execute(interaction) {
     const type = interaction.options.getString("type");
     const scope = interaction.options.getString("scope") || "global";
 
-    const raw = await fs.readFile("data/users.json", "utf8");
-    const users = JSON.parse(raw || "{}");
+    
+    const users = loadUsers();
     let entries = Object.entries(users);
 
     

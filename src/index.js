@@ -87,53 +87,53 @@ process.on("unhandledRejection", (err) => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  try {
-    const res = await fetch("https://api.chatguard.cedrugs.app/v1/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: message.content,
-        treshold: 0.5,
-      }),
-    });
+  // try {
+  //   const res = await fetch("https://api.chatguard.cedrugs.app/v1/predict", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       text: message.content,
+  //       treshold: 0.5,
+  //     }),
+  //   });
 
-    const data = await res.json();
-    console.log("Loaded Cedrugs's chatguard");
-    if (data.label === "toxic") {
-      const offend = message.content
-      try {
-        await message.delete();
-      } catch (err) {
-        console.error("Failed to delete message:", err);
-      }
-      await message.channel.send({
-      embeds: [{
-          title: "Message Removed",
-          description: `A message from **${message.author.tag}** was removed for violating chat rules.`,
-          color: 0xff4d4d,
-          footer: { text: "Chat Moderation by Evernight" }
-        }]
-      });
-      try {
-      await message.author.send({
-        embeds: [{
-          title: "⚠️ Evernight Moderation Alert!",
-          description:
-            "Hey!! I noticed your message was a bit too harsh, so I had to take it down.\n\n" +
-            "**Here’s what you sent:**\n" +
-            `> ${offend}\n\n` +
-            "Try to keep things friendly next time, okay Trailblazer?",
-          color: 0x8B0000
-        }]
-      });
-    } catch (err) {
-      console.error("DM failed:", err);
-    }
-      return; 
-    }
-  } catch (err) {
-    console.error("chatguard error", err);
-  }
+  //   const data = await res.json();
+  //   console.log("Loaded Cedrugs's chatguard");
+  //   if (data.label === "toxic") {
+  //     const offend = message.content
+  //     try {
+  //       await message.delete();
+  //     } catch (err) {
+  //       console.error("Failed to delete message:", err);
+  //     }
+  //     await message.channel.send({
+  //     embeds: [{
+  //         title: "Message Removed",
+  //         description: `A message from **${message.author.tag}** was removed for violating chat rules.`,
+  //         color: 0xff4d4d,
+  //         footer: { text: "Chat Moderation by Evernight" }
+  //       }]
+  //     });
+  //     try {
+  //     await message.author.send({
+  //       embeds: [{
+  //         title: "⚠️ Evernight Moderation Alert!",
+  //         description:
+  //           "Hey!! I noticed your message was a bit too harsh, so I had to take it down.\n\n" +
+  //           "**Here’s what you sent:**\n" +
+  //           `> ${offend}\n\n` +
+  //           "Try to keep things friendly next time, okay Trailblazer?",
+  //         color: 0x8B0000
+  //       }]
+  //     });
+  //   } catch (err) {
+  //     console.error("DM failed:", err);
+  //   }
+  //     return; 
+  //   }
+  // } catch (err) {
+  //   console.error("chatguard error", err);
+  // }
 
   if (!message.reference) return;
 
