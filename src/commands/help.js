@@ -26,7 +26,7 @@ export async function execute(interaction) {
             {name : "osu", value : "Show your osu profile", inline : false},
             {name : "/recent", value : "get the most recent play of an osu player", inline : false},
             {name : "/adventure", value : "Play a turnbase game(WIP)", inline : false},
-            {name : "/rpg", value : "Upgrade your adventure stats", inline : false},        
+            {name : "/shop", value : "Upgrade your adventure stats", inline : false},        
         )
         
         .setFooter({text : "♭ I know your past, the things you want to see ♭, to touch ♭, to know ♭"})
