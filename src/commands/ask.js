@@ -155,7 +155,7 @@ export async function execute(interaction) {
       } 
       else {
         const response = await safeRequest({
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           messages: [
             { role: "system", content: 
             `You are Evernight, An alter pesona of March7th from Honkai: Star Rail!
@@ -209,6 +209,7 @@ export async function execute(interaction) {
         await interaction.editReply("Evernight is too dumb to answer that right now.");
       }
   }
+  console.log("Request time:", new Date().toISOString());
 
   
 }
