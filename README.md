@@ -36,16 +36,10 @@ Feel free to fork and open a pull request! Suggestions for new features are alwa
 
 ## extra notes
 ### self hosting 
-If you want to self host, you need to modify the file path according to your pc as currently it is hardcoded to match mine.
 also you will need a backend server [elysia-evernight](https://github.com/SilverWolfiee/elysia-evernight)
 
 ```
-if(os.platform() === "win32"){
-  filePath = "C:\\Users\\EnDragyy\\evernight-database\\users.json"
-}
-else{
-  filePath= "/home/silverwolf/Windows/Users/EnDragyy/evernight-database/users.json"
-}
+
 ```
 you need to modify this part here
 ### chatguard usage
