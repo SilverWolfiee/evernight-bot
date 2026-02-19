@@ -37,11 +37,6 @@ Feel free to fork and open a pull request! Suggestions for new features are alwa
 ## extra notes
 ### self hosting 
 also you will need a backend server [elysia-evernight](https://github.com/SilverWolfiee/elysia-evernight)
-
-```
-
-```
-you need to modify this part here
 ### chatguard usage
 You need to give Evernight admin permissions for chatguard to work properly.
 Without admin perms, she won't be able to delete offensive message
