@@ -12,7 +12,7 @@ const fiveStars = [
   "Dan Heng Permansor Terrae","Dr. Ratio","Evernight","Feixiao","Firefly","Fugue","Fu Xuan",
   "Himeko","Huo Huo","Hyacine","Hysilens","Jade","Jiaoqiu","Jing Liu","Jing Yuan","Kafka",
   "Lingsha","Luocha","Mydei","Phainon","Rappa","Robin","Ruan Mei","Saber","Seele","Silver Wolf",
-  "Sparkle","Sunday","Topaz","Tribbie","The Herta","Welt","Yanqing","Yunli"
+  "Sparkle","Sparxie","Sunday","Topaz","Tribbie","The Herta","Welt","Yanqing","Yaoguang","Yunli"
 ];
 
 const fourStars = [
