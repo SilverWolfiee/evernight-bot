@@ -17,6 +17,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - :motorized_wheelchair: **Gen** - Generate a demotivator meme within your server.
 - github linking and github profile flexing
 - GeminiAI support.
+- fnafmml profile searching for Fnaf Maxmode Players(Using fnafmml API)
 - [chatguardAPI](https://github.com/cedrugs/Chatguard-API) by [Cedrugs](https://github.com/cedrugs)
 
 
@@ -40,3 +41,7 @@ also you will need a backend server [elysia-evernight](https://github.com/Silver
 ### chatguard usage
 You need to give Evernight admin permissions for chatguard to work properly.
 Without admin perms, she won't be able to delete offensive message
+
+
+### extra notes
+I am aware some functionality are not working as intended/missing(i.e Hard mode in rpg battle, multiplayer blackjack) and not secure. I will plan to fix them once i learnt the appropiate techniques
