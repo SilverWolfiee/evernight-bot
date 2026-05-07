@@ -1,3 +1,4 @@
+// blackjack.js
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { loadUsers } from "../../data/userdata.js";
 
@@ -18,7 +19,7 @@ export async function execute(interaction) {
 
     if (!user) {
         await interaction.reply({
-            content: "Please create an account with /register first",
+            content: "Wait! You need an account first! Use /register so we can keep track of your Jades!",
             ephemeral: true,
         });
         return;
@@ -26,7 +27,7 @@ export async function execute(interaction) {
 
     if (user.jades < bet) {
         await interaction.reply({
-            content: `Aww, you don't have enough Jades for that bet! You only have ${user.jades} Jades left.`,
+            content: `Aww, you don't have enough Jades! You only have ${user.jades} Stellar Jades left.`,
             ephemeral: true,
         });
         return;
@@ -34,13 +35,13 @@ export async function execute(interaction) {
 
     const embed = new EmbedBuilder()
         .setTitle("Evernight Blackjack")
-        .setDescription(`Your bet : **${bet}**`)
-        .setColor("Purple")
-        
+        .setDescription(`Ready to bet **${bet}** Stellar Jades?`)
+        .setColor("Purple");
 
     const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-            .setCustomId("bj_start")
+    
+            .setCustomId(`bj_start_${bet}`) 
             .setLabel("Deal the Cards!")
             .setStyle(ButtonStyle.Success)
     );

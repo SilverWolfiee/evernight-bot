@@ -187,40 +187,23 @@ export class BlackjackGame {
 export async function handleBlackjackButton(interaction) {
   const users = loadUsers();
   const user = users[interaction.user.id];
+  
   if (!user) {
-    await interaction.reply({
-      content: "Please create an account using /register.",
-      ephemeral: true,
-    });
+    await interaction.reply({ content: "Register first!", ephemeral: true });
     return;
   }
 
-  if (interaction.customId === "bj_single") {
-    await interaction.reply({ content: "Enter your bet in Jades (number only):", ephemeral: true });
+  if (interaction.customId.startsWith("bj_start_")) {
+    const bet = parseInt(interaction.customId.split("_")[2]);
 
-    const filter = m => m.author.id === interaction.user.id;
-    const collector = interaction.channel.createMessageCollector({ filter, time: 30000, max: 1 });
+    if (user.jades < bet) {
+      return await interaction.reply({ content: "Not enough Jades!", ephemeral: true });
+    }
 
-    collector.on("collect", async m => {
-      const bet = parseInt(m.content);
-      if (isNaN(bet) || bet <= 0) {
-        await interaction.followUp({ content: "Invalid bet. Use a positive number.", ephemeral: true });
-        return;
-      }
-      if (user.jades < bet) {
-        await interaction.followUp({ content: "Not enough Jades to place that bet.", ephemeral: true });
-        return;
-      }
-
-      const game = new BlackjackGame(interaction, interaction.user.id, bet);
-      await game.start();
-    });
-
-    collector.on("end", collected => {
-      if (collected.size === 0)
-        interaction.followUp({ content: "You didn't enter a bet in time!", ephemeral: true });
-    });
-  } else if (interaction.customId === "bj_multi") {
-    await interaction.reply({ content: "Multiplayer mode coming soon!", ephemeral: true });
+   
+    await interaction.deferUpdate();
+    
+    const game = new BlackjackGame(interaction, interaction.user.id, bet);
+    await game.start();
   }
 }
