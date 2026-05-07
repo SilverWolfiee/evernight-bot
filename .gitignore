@@ -6,4 +6,5 @@ start.bat
 node_modules/
 data/database.js
 src/utils/osuapi.js
+docker-compose.yml
 

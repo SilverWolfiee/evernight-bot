@@ -48,7 +48,7 @@ export async function execute(interaction) {
 
     if (user.credits < amount) {
       await interaction.editReply({
-        content: "Aww poor you, you don’t have enough money <:evernight_dog:1432386535520731166>",
+        content: "Aww poor you, you don’t have enough money",
       });
       return;
     }

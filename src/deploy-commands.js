@@ -4,19 +4,19 @@ import { command as register } from "./commands/register.js";
 import { command as profile } from "./commands/profile.js";
 import { command as bet } from "./commands/bet.js";
 import { command as daily } from "./commands/daily.js";
-import { command as leaderboard } from "./commands/leaderboard.js";
+// import { command as leaderboard } from "./commands/leaderboard.js";
 import { command as gen } from "./commands/gen.js";
 import { command as help } from "./commands/help.js";
 import { command as gacha } from "./commands/gacha.js";
 import { command as inventory } from "./commands/inventory.js";
-import { command as ask } from "./commands/ask.js";
+// import { command as ask } from "./commands/ask.js";
 import { command as blackjack } from "./commands/blackjack.js";
-import { command as adventure } from "./commands/adventure.js";
-import { command as shop } from "./commands/shop.js";
-import { command as linkgithub } from "./commands/linkgithub.js";
-import { command as gitprofile } from "./commands/gitprofile.js";
-import { command as linkosu } from "./commands/linkosu.js";
-import { command as osu } from "./commands/osu.js";
+// import { command as adventure } from "./commands/adventure.js";
+// import { command as shop } from "./commands/shop.js";
+// import { command as linkgithub } from "./commands/linkgithub.js";
+// import { command as gitprofile } from "./commands/gitprofile.js";
+// import { command as linkosu } from "./commands/linkosu.js";
+// import { command as osu } from "./commands/osu.js";
 import { command as recent } from "./commands/recent.js";
 import { command as weather } from "./commands/weather.js";
 
@@ -25,21 +25,15 @@ const commands = [
   profile,
   bet,
   daily,
-  leaderboard,
-  gitprofile,
-  linkosu,
-  osu,
   recent,
   gen,
   help,
   gacha,
-  linkgithub,
-  inventory,
-  ask,
   blackjack,
   weather,
-  adventure,
-  shop,
+  inventory,
+  // adventure,
+  // shop,
 ].map((cmd) => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);

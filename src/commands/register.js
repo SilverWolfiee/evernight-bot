@@ -18,7 +18,7 @@ export async function execute(interaction) {
     }
 
     users[userId] = {
-      jades: 1600,
+      jades: 50000,
       credits: 10000,
       pity: 0,
       registeredAt: new Date().toISOString(),
@@ -27,7 +27,7 @@ export async function execute(interaction) {
     saveUsers(users);
 
     await interaction.editReply(
-      `Successfully registered an account!\nYou received **1600 jades** and **10,000 credits** as a starting gift.`
+      `Successfully registered an account!\nYou received **50000 jades** and **10,000 credits** as a starting gift.`
     );
   } catch (err) {
     console.error("Error in /register:", err);
