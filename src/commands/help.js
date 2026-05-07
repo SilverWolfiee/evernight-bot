@@ -11,7 +11,7 @@ export async function execute(interaction) {
         .setTitle("Guide to Evernight-bot")
         .setDescription("All available commands")
         .addFields(
-            {name : "/bet", value : "Bet on heads on tails with your credits", inline : false},
+            {name : "/bet", value : "Bet on heads or tails with your credits", inline : false},
             {name : "/Daily", value : "Claim your Daily reward once every 24 Hours", inline : false},
             // {name : "/leaderboard", value : "See Local/Global leaderboard", inline : false},
             {name : "/Profile", value : "See your Evernight Profile", inline : false},
