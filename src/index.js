@@ -84,6 +84,81 @@ process.on("unhandledRejection", (err) => {
   console.error("Unhandled promise rejection:", err);
 });
 
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+
+  try {
+    
+    const res = await fetch("http://localhost:3000/v1/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: message.content }),
+    });
+
+    const data = await res.json();
+    console.log(`[ChatGuard] "${message.content}" → ${data.category} (${data.score.toFixed(3)})`);
+
+    // Implicit/Covert Hate or Explicit Toxicity  delete 
+    if (data.action === "delete") {
+      const offend = message.content;
+
+      try {
+        await message.delete();
+      } catch (err) {
+        console.error("Failed to delete message:", err);
+      }
+
+      await message.channel.send({
+        embeds: [{
+          title: "🚫 Message Removed",
+          description: `A message from **${message.author.tag}** was removed for violating chat rules.\n\n` +
+                       `**Category:** ${data.category}\n**Score:** ${data.score.toFixed(3)}`,
+          color: 0xff4d4d,
+          footer: { text: "Chat Moderation • ChatGuard" }
+        }]
+      });
+
+      try {
+        await message.author.send({
+          embeds: [{
+            title: "⚠️ Moderation Alert",
+            description:
+              "Your message was removed for violating community guidelines.\n\n" +
+              "**Here's what you sent:**\n" +
+              `> ${offend}\n\n` +
+              `**Toxicity Category:** ${data.category}\n\n` +
+              "Please keep things respectful. Thank you.",
+            color: 0x8B0000,
+            footer: { text: "Chat Moderation • ChatGuard" }
+          }]
+        });
+      } catch (err) {
+        console.error("DM failed:", err);
+      }
+    }
+
+    // Ambiguous
+    if (data.action === "warn") {
+      try {
+        await message.reply({
+          embeds: [{
+            title: "⚠️ Watch Your Language",
+            description:
+              `Hey ${message.author}, your message may be borderline.\n\n` +
+              "Please be mindful of how your words may affect others.",
+            color: 0xffa500,
+            footer: { text: `Toxicity Score: ${data.score.toFixed(3)} • ChatGuard` }
+          }]
+        });
+      } catch (err) {
+        console.error("Warning failed:", err);
+      }
+    }
+
+  } catch (err) {
+    console.error("ChatGuard error:", err);
+  }
+});
 // client.on("messageCreate", async (message) => {
 //   if (message.author.bot) return;
 
