@@ -18,7 +18,7 @@ A simple Discord bot built with **discord.js**, featuring daily rewards, betting
 - github linking and github profile flexing
 - GeminiAI support.
 - fnafmml profile searching for Fnaf Maxmode Players(Using fnafmml API)
-- [chatguardAPI](https://github.com/cedrugs/Chatguard-API) by [Cedrugs](https://github.com/cedrugs)
+- [chatguardAPI](https://github.com/SilverWolfiee/Toxic-Detector) by [Rycene](https://github.com/SilverWolfiee)
 
 
 ---
