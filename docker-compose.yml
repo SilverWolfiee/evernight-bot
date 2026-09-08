@@ -1,0 +1,19 @@
+services:
+  elysia-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: elysia-bot:latest
+    container_name: elysia-bot
+    restart: always
+    env_file:
+      - .env
+    volumes :
+      - ./data:/usr/src/app/data
+    networks:
+      - elysia-network
+    
+
+networks:
+  elysia-network:
+    external: true
