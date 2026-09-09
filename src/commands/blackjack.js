@@ -1,6 +1,7 @@
 // blackjack.js
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { loadUsers } from "../../data/userdata.js";
+import { activeGames } from "../utils/blackjackutils.js/activegame.js";
 
 export const command = new SlashCommandBuilder()
     .setName("blackjack")
@@ -24,7 +25,13 @@ export async function execute(interaction) {
         });
         return;
     }
-
+    if (activeGames.has(interaction.user.id)) {
+        await interaction.reply({
+            content: "Hey~ You already have an active Blackjack game going on! Finish that one first! <:evernight_confused:1433435422125461586>",
+            ephemeral: true,
+        });
+        return;
+    }
     if (user.jades < bet) {
         await interaction.reply({
             content: `Aww, you don't have enough Jades! You only have ${user.jades} Stellar Jades left.`,
@@ -41,7 +48,7 @@ export async function execute(interaction) {
     const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
     
-            .setCustomId(`bj_start_${bet}`) 
+            .setCustomId(`bj_start_${bet}_${interaction.user.id}`)
             .setLabel("Deal the Cards!")
             .setStyle(ButtonStyle.Success)
     );

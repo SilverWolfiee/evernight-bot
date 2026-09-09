@@ -4,11 +4,14 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from "discord.js";
-import { loadUsers, saveUsers } from "../../data/userdata.js";
-import { getTier, addXp } from "./level_mgr.js";
+import { loadUsers, saveUsers } from "../../../data/userdata.js";
+import { getTier, addXp } from "../level_mgr.js";
+import { activeGames } from "./activegame.js";
+
 const BASE_XP_REWARD = 50;
 const XP_PER_LEVEL = 0.05;
 const XP_PER_TIER = 0.1;
+
 export class BlackjackGame {
   constructor(interaction, userId, bet) {
     this.interaction = interaction;
@@ -70,9 +73,15 @@ export class BlackjackGame {
     return hand.map((c) => `${c.value}${c.suit}`).join(" ");
   }
 
+  cleanup() {
+    this.finished = true;
+    activeGames.delete(this.userId);
+  }
+
   async start() {
     const user = this.users[this.userId];
     if (user.jades < this.bet) {
+      activeGames.delete(this.userId);
       await this.interaction.reply({
         content:
           "You don't have enough Stellar Jades <:stellar_jade:1432377631210344530>.",
@@ -147,7 +156,6 @@ export class BlackjackGame {
       const user = this.users[this.userId];
 
       if (i.customId === "stand") {
-        this.finished = true;
         await this.finish(gameMsg, this.dealerPlay());
       } else if (i.customId === "double") {
         if (user.jades < this.bet) {
@@ -161,7 +169,7 @@ export class BlackjackGame {
         this.bet *= 2;
         saveUsers(this.users);
         this.player.push(this.drawCard());
-        this.finished = true;
+        
         const val = this.getValue(this.player);
         if (val > 21) {
           await this.finish(gameMsg, false);
@@ -171,14 +179,11 @@ export class BlackjackGame {
       } else if (i.customId === "surrender") {
         const refund = Math.floor(this.bet / 2);
         user.jades += refund;
-        this.finished = true;
-        saveUsers(this.users);
         await this.finishSurrender(gameMsg, refund);
       } else if (i.customId === "hit") {
         this.player.push(this.drawCard());
         const val = this.getValue(this.player);
         if (val > 21) {
-          this.finished = true;
           await this.finish(gameMsg, false);
         } else {
           const row = new ActionRowBuilder().addComponents(
@@ -211,6 +216,7 @@ export class BlackjackGame {
 
     collector.on("end", async () => {
       if (!this.finished) {
+        this.cleanup();
         const disabledRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setCustomId("hit")
@@ -235,7 +241,9 @@ export class BlackjackGame {
     while (this.getValue(this.dealer) < 17) this.dealer.push(this.drawCard());
     return this.getValue(this.dealer) <= 21;
   }
+
   async finishSurrender(gameMsg, refund) {
+    this.cleanup();
     const user = this.users[this.userId];
     const tier = getTier(user.level);
     const baseGain =
@@ -247,6 +255,9 @@ export class BlackjackGame {
     const levelMsg = leveledUp
       ? `\n🎉 **You Leveled Up to Level ${user.level}!**`
       : "";
+
+    saveUsers(this.users);
+
     const embed = new EmbedBuilder()
       .setTitle(`Blackjack Result`)
       .setColor("DarkRed")
@@ -254,6 +265,7 @@ export class BlackjackGame {
         `**Your hand:** ${this.formatHand(this.player)} (${this.getValue(this.player)})\n` +
           `**Evernight:** ${this.formatHand(this.dealer, true)}\n\n` +
           `You surrendered! Returned **${refund}** Stellar Jades. <:evernight_confused:1433435422125461586>\n` +
+          `+${xpGain} XP gained!${levelMsg}\n` +
           `Current Jades: ${user.jades}`,
       );
 
@@ -282,7 +294,9 @@ export class BlackjackGame {
 
     await gameMsg.edit({ embeds: [embed], components: [disabledRow] });
   }
+
   async finish(gameMsg, dealerSafe) {
+    this.cleanup();
     const playerVal = this.getValue(this.player);
     const dealerVal = this.getValue(this.dealer);
     const user = this.users[this.userId];
@@ -292,28 +306,27 @@ export class BlackjackGame {
 
     if (playerVal > 21) {
       result = "You busted! <:evernight_dog:1432386535520731166>";
-      outcomeMultiplier = 0.5; // Loss
+      outcomeMultiplier = 0.5;
     } else if (!dealerSafe) {
       user.jades += this.bet * 2;
       result =
         "Evernight busted <:evernight_cry:1433434486418182325> — You win!";
-      outcomeMultiplier = 2.0; // Win bonus
+      outcomeMultiplier = 2.0;
     } else if (playerVal > dealerVal) {
       user.jades += this.bet * 2;
       result =
         "You win against Evernight! <:evernight_daily:1432392306387980451>";
-      outcomeMultiplier = 2.0; // Win bonus
+      outcomeMultiplier = 2.0;
     } else if (playerVal === dealerVal) {
       user.jades += this.bet;
       result = "It’s a draw... <:evernight_confused:1433435422125461586>";
-      outcomeMultiplier = 1.0; // Draw
+      outcomeMultiplier = 1.0;
     } else {
       result =
         "Evernight wins this round~ <:evernight_smug:1433435206353944596>";
-      outcomeMultiplier = 0.5; // Loss
+      outcomeMultiplier = 0.5;
     }
 
-   
     const tier = getTier(user.level);
     const baseGain =
       BASE_XP_REWARD *
@@ -366,23 +379,36 @@ export class BlackjackGame {
 }
 
 export async function handleBlackjackButton(interaction) {
-  const users = loadUsers();
-  const user = users[interaction.user.id];
-
-  if (!user) {
-    await interaction.reply({ content: "Register first!", ephemeral: true });
-    return;
-  }
-
   if (interaction.customId.startsWith("bj_start_")) {
-    const bet = parseInt(interaction.customId.split("_")[2]);
+    const parts = interaction.customId.split("_");
+    const bet = parseInt(parts[2]);
+    const ownerId = parts[3];
 
-    if (user.jades < bet) {
+    if (ownerId && interaction.user.id !== ownerId) {
+      return await interaction.reply({
+        content: "This isn't your game setup~ Run /blackjack to start your own!",
+        ephemeral: true,
+      });
+    }
+
+    if (activeGames.has(interaction.user.id)) {
+      return await interaction.reply({
+        content: "You already have a game running!",
+        ephemeral: true,
+      });
+    }
+
+    const users = loadUsers();
+    const user = users[interaction.user.id];
+
+    if (!user || user.jades < bet) {
       return await interaction.reply({
         content: "Not enough Jades!",
         ephemeral: true,
       });
     }
+
+    activeGames.add(interaction.user.id);
 
     await interaction.deferUpdate();
 
