@@ -1,7 +1,7 @@
 // blackjack.js
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { loadUsers } from "../../data/userdata.js";
-import { activeGames } from "../utils/blackjackutils.js/activegame.js";
+import { activeGames } from "../utils/blackjackutils/activegame.js";
 
 export const command = new SlashCommandBuilder()
     .setName("blackjack")
@@ -14,44 +14,53 @@ export const command = new SlashCommandBuilder()
     );
 
 export async function execute(interaction) {
-    const users = await loadUsers();
-    const user = users[interaction.user.id];
-    const bet = interaction.options.getInteger("jades");
+    try {
+        const users = await loadUsers();
+        const user = users[interaction.user.id];
+        const bet = interaction.options.getInteger("jades");
 
-    if (!user) {
-        await interaction.reply({
-            content: "Wait! You need an account first! Use /register so we can keep track of your Jades!",
-            ephemeral: true,
-        });
-        return;
+        if (!user) {
+            await interaction.reply({
+                content: "Wait! You need an account first! Use /register so we can keep track of your Jades!",
+                ephemeral: true,
+            });
+            return;
+        }
+        if (activeGames.has(interaction.user.id)) {
+            await interaction.reply({
+                content: "Hey~ You already have an active Blackjack game going on! Finish that one first! <:evernight_confused:1433435422125461586>",
+                ephemeral: true,
+            });
+            return;
+        }
+        if (user.jades < bet) {
+            await interaction.reply({
+                content: `Aww, you don't have enough Jades! You only have ${user.jades} Stellar Jades left.`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle("Evernight Blackjack")
+            .setDescription(`Ready to bet **${bet}** Stellar Jades?`)
+            .setColor("Purple");
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`bj_start_${bet}_${interaction.user.id}`)
+                .setLabel("Deal the Cards!")
+                .setStyle(ButtonStyle.Success)
+        );
+
+        await interaction.reply({ embeds: [embed], components: [row] });
+    } catch (error) {
+        console.error("Error executing /blackjack:", error);
+        if (!interaction.replied && !interaction.deferred) {
+            await interaction.reply({
+                content: "An unexpected error occurred while starting Blackjack!",
+                ephemeral: true,
+            });
+        }
     }
-    if (activeGames.has(interaction.user.id)) {
-        await interaction.reply({
-            content: "Hey~ You already have an active Blackjack game going on! Finish that one first! <:evernight_confused:1433435422125461586>",
-            ephemeral: true,
-        });
-        return;
-    }
-    if (user.jades < bet) {
-        await interaction.reply({
-            content: `Aww, you don't have enough Jades! You only have ${user.jades} Stellar Jades left.`,
-            ephemeral: true,
-        });
-        return;
-    }
-
-    const embed = new EmbedBuilder()
-        .setTitle("Evernight Blackjack")
-        .setDescription(`Ready to bet **${bet}** Stellar Jades?`)
-        .setColor("Purple");
-
-    const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-    
-            .setCustomId(`bj_start_${bet}_${interaction.user.id}`)
-            .setLabel("Deal the Cards!")
-            .setStyle(ButtonStyle.Success)
-    );
-
-    await interaction.reply({ embeds: [embed], components: [row] });
 }

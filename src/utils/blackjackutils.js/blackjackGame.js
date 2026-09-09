@@ -398,7 +398,7 @@ export async function handleBlackjackButton(interaction) {
       });
     }
 
-    const users = loadUsers();
+    const users = await loadUsers();
     const user = users[interaction.user.id];
 
     if (!user || user.jades < bet) {

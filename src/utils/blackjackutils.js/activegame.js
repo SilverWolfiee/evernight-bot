@@ -1,1 +1,1 @@
-export const activeGames = new set()
+export const activeGames = new Set()
