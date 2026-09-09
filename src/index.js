@@ -73,8 +73,8 @@ client.on("interactionCreate", async (interaction) => {
     return await handleBlackjackButton(interaction);
   }
   if (interaction.isButton() && ["atk","skill","ult","run"].includes(interaction.customId)) {
-    const { handleBattleButton } = await import("../data/battle.js"); 
-    return handleBattleButton(interaction)
+    
+    return await handleBattleButton(interaction)
   }
   await battleInteraction(interaction);
 });
