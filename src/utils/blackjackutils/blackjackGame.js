@@ -73,6 +73,10 @@ export class BlackjackGame {
     return hand.map((c) => `${c.value}${c.suit}`).join(" ");
   }
 
+  isNatural(hand) {
+    return hand.length === 2 && this.getValue(hand) === 21;
+  }
+
   cleanup() {
     this.finished = true;
     activeGames.delete(this.userId);
@@ -84,7 +88,7 @@ export class BlackjackGame {
 
     if (!user || user.jades < this.bet) {
       activeGames.delete(this.userId);
-      await buttonInteraction.reply({
+      await buttonInteraction.followUp({
         content:
           "You don't have enough Stellar Jades <:stellar_jade:1432377631210344530>.",
         ephemeral: true,
@@ -97,6 +101,74 @@ export class BlackjackGame {
 
     this.player.push(this.drawCard(), this.drawCard());
     this.dealer.push(this.drawCard(), this.drawCard());
+
+    const playerNatural = this.isNatural(this.player);
+    const dealerNatural = this.isNatural(this.dealer);
+
+   
+    if (playerNatural || dealerNatural) {
+      this.cleanup();
+
+      let result;
+      let outcomeMultiplier = 1.0;
+
+      if (playerNatural && dealerNatural) {
+        user.jades += this.bet; // Draw
+        result = "Both got Blackjack! It's a draw... <:evernight_confused:1433435422125461586>";
+        outcomeMultiplier = 1.0;
+      } else if (playerNatural) {
+        user.jades += this.bet * 3; // 2:1 Payout 
+        result = "🎉 **NATURAL BLACKJACK!** You win 2:1 payout! <:evernight_daily:1432392306387980451>";
+        outcomeMultiplier = 2.5;
+      } else {
+        result = "Evernight hit a Natural Blackjack~ <:evernight_smug:1433435206353944596>";
+        outcomeMultiplier = 0.5;
+      }
+
+      const tier = getTier(user.level);
+      const baseGain =
+        BASE_XP_REWARD *
+        (1 + user.level * XP_PER_LEVEL) *
+        (1 + tier * XP_PER_TIER);
+      const xpGain = Math.floor(baseGain * outcomeMultiplier);
+
+      const leveledUp = addXp(user, xpGain);
+      const levelMsg = leveledUp
+        ? `\n🎉 **You Leveled Up to Level ${user.level}!**`
+        : "";
+
+      saveUsers(this.users);
+
+      const embed = new EmbedBuilder()
+        .setTitle(`Blackjack Result`)
+        .setColor("DarkRed")
+        .setDescription(
+          `**Your hand:** ${this.formatHand(this.player)} (${this.getValue(this.player)})\n` +
+            `**Evernight:** ${this.formatHand(this.dealer)} (${this.getValue(this.dealer)})\n\n${result}\n` +
+            `+${xpGain} XP gained!${levelMsg}\n` +
+            `Current Jades: ${user.jades}`,
+        );
+
+      const disabledRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("hit")
+          .setLabel("Hit")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId("stand")
+          .setLabel("Stand")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(true),
+      );
+
+      await buttonInteraction.editReply({
+        content: `Blackjack game of <@${this.userId}>`,
+        embeds: [embed],
+        components: [disabledRow],
+      });
+      return;
+    }
 
     const embed = new EmbedBuilder()
       .setTitle(`Blackjack with Evernight`)
@@ -126,8 +198,7 @@ export class BlackjackGame {
         .setStyle(ButtonStyle.Secondary),
     );
 
-    // Edit the message that hosted the "Deal the Cards!" button!
-    const gameMsg = await buttonInteraction.update({
+    const gameMsg = await buttonInteraction.editReply({
       content: `Blackjack game of <@${this.userId}>`,
       embeds: [embed],
       components: [row],
@@ -156,8 +227,7 @@ export class BlackjackGame {
 
       await i.deferUpdate();
       if (this.finished) return;
-      
-      // Always fetch fresh state from disk inside collector
+
       this.users = await loadUsers();
       const user = this.users[this.userId];
 
@@ -175,7 +245,7 @@ export class BlackjackGame {
         this.bet *= 2;
         saveUsers(this.users);
         this.player.push(this.drawCard());
-        
+
         const val = this.getValue(this.player);
         if (val > 21) {
           await this.finish(gameMsg, false);
@@ -407,11 +477,13 @@ export async function handleBlackjackButton(interaction) {
         });
       }
 
+      await interaction.deferUpdate();
+
       const users = await loadUsers();
       const user = users[interaction.user.id];
 
       if (!user || user.jades < bet) {
-        return await interaction.reply({
+        return await interaction.followUp({
           content: "Not enough Jades!",
           ephemeral: true,
         });
@@ -424,12 +496,6 @@ export async function handleBlackjackButton(interaction) {
     } catch (error) {
       console.error("Error in handleBlackjackButton:", error);
       activeGames.delete(interaction.user.id);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: "An unexpected error occurred while starting Blackjack!",
-          ephemeral: true,
-        });
-      }
     }
   }
 }
