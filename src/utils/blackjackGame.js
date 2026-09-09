@@ -5,7 +5,10 @@ import {
   ButtonStyle,
 } from "discord.js";
 import { loadUsers, saveUsers } from "../../data/userdata.js";
-
+import { getTier, addXp } from "./level_mgr.js";
+const BASE_XP_REWARD = 50;
+const XP_PER_LEVEL = 0.05;
+const XP_PER_TIER = 0.1;
 export class BlackjackGame {
   constructor(interaction, userId, bet) {
     this.interaction = interaction;
@@ -141,7 +144,7 @@ export class BlackjackGame {
 
       await i.deferUpdate();
       if (this.finished) return;
-      const user = this.users[this.userId]
+      const user = this.users[this.userId];
 
       if (i.customId === "stand") {
         this.finished = true;
@@ -168,7 +171,7 @@ export class BlackjackGame {
       } else if (i.customId === "surrender") {
         const refund = Math.floor(this.bet / 2);
         user.jades += refund;
-        this.finished = true
+        this.finished = true;
         saveUsers(this.users);
         await this.finishSurrender(gameMsg, refund);
       } else if (i.customId === "hit") {
@@ -200,7 +203,7 @@ export class BlackjackGame {
           await gameMsg.edit({
             content: `Blackjack game of <@${this.userId}>`,
             embeds: [embed],
-            components: [row]
+            components: [row],
           });
         }
       }
@@ -234,6 +237,16 @@ export class BlackjackGame {
   }
   async finishSurrender(gameMsg, refund) {
     const user = this.users[this.userId];
+    const tier = getTier(user.level);
+    const baseGain =
+      BASE_XP_REWARD *
+      (1 + user.level * XP_PER_LEVEL) *
+      (1 + tier * XP_PER_TIER);
+    const xpGain = Math.floor(baseGain * 0.25);
+    const leveledUp = addXp(user, xpGain);
+    const levelMsg = leveledUp
+      ? `\n🎉 **You Leveled Up to Level ${user.level}!**`
+      : "";
     const embed = new EmbedBuilder()
       .setTitle(`Blackjack Result`)
       .setColor("DarkRed")
@@ -275,23 +288,43 @@ export class BlackjackGame {
     const user = this.users[this.userId];
 
     let result;
+    let outcomeMultiplier = 1.0;
+
     if (playerVal > 21) {
       result = "You busted! <:evernight_dog:1432386535520731166>";
+      outcomeMultiplier = 0.5; // Loss
     } else if (!dealerSafe) {
       user.jades += this.bet * 2;
       result =
         "Evernight busted <:evernight_cry:1433434486418182325> — You win!";
+      outcomeMultiplier = 2.0; // Win bonus
     } else if (playerVal > dealerVal) {
       user.jades += this.bet * 2;
       result =
         "You win against Evernight! <:evernight_daily:1432392306387980451>";
+      outcomeMultiplier = 2.0; // Win bonus
     } else if (playerVal === dealerVal) {
       user.jades += this.bet;
       result = "It’s a draw... <:evernight_confused:1433435422125461586>";
+      outcomeMultiplier = 1.0; // Draw
     } else {
       result =
         "Evernight wins this round~ <:evernight_smug:1433435206353944596>";
+      outcomeMultiplier = 0.5; // Loss
     }
+
+   
+    const tier = getTier(user.level);
+    const baseGain =
+      BASE_XP_REWARD *
+      (1 + user.level * XP_PER_LEVEL) *
+      (1 + tier * XP_PER_TIER);
+    const xpGain = Math.floor(baseGain * outcomeMultiplier);
+
+    const leveledUp = addXp(user, xpGain);
+    const levelMsg = leveledUp
+      ? `\n🎉 **You Leveled Up to Level ${user.level}!**`
+      : "";
 
     saveUsers(this.users);
 
@@ -301,6 +334,7 @@ export class BlackjackGame {
       .setDescription(
         `**Your hand:** ${this.formatHand(this.player)} (${playerVal})\n` +
           `**Evernight:** ${this.formatHand(this.dealer)} (${dealerVal})\n\n${result}\n` +
+          `+${xpGain} XP gained!${levelMsg}\n` +
           `Current Jades: ${user.jades}`,
       );
 
