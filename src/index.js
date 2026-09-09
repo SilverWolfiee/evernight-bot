@@ -69,7 +69,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isButton() && interaction.customId.startsWith("bj_")) {
-    const { handleBlackjackButton } = await import("./utils/blackjackGame.js");
+   
     return await handleBlackjackButton(interaction);
   }
   if (interaction.isButton() && ["atk","skill","ult","run"].includes(interaction.customId)) {
