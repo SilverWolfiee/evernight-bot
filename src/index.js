@@ -7,7 +7,7 @@ import path from "path";
 import { autoRegeneratePower } from "./utils/power.js";
 import { loadUsers } from "../data/userdata.js";
 import { battleInteraction } from "./utils/battle_mgr.js";
-
+import { handleBlackjackButton } from "./utils/blackjackutils/blackjackGame.js";
 
 
 // const ASK_LOG_PATH = path.join(process.cwd(), "data", "ask_messages.json");
