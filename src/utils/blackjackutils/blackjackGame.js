@@ -254,7 +254,6 @@ export class BlackjackGame {
         }
       } else if (i.customId === "surrender") {
         const refund = Math.floor(this.bet / 2);
-        user.jades += refund;
         await this.finishSurrender(gameMsg, refund);
       } else if (i.customId === "hit") {
         this.player.push(this.drawCard());
@@ -322,6 +321,7 @@ export class BlackjackGame {
     this.cleanup();
     this.users = await loadUsers();
     const user = this.users[this.userId];
+    user.jades += refund
     const tier = getTier(user.level);
     const baseGain =
       BASE_XP_REWARD *
