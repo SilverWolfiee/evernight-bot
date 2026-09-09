@@ -17,7 +17,7 @@ export class BlackjackGame {
     this.interaction = interaction;
     this.userId = userId;
     this.bet = bet;
-    this.users = loadUsers();
+    this.users = {};
     this.player = [];
     this.dealer = [];
     this.deck = this.createDeck();
@@ -78,11 +78,13 @@ export class BlackjackGame {
     activeGames.delete(this.userId);
   }
 
-  async start() {
+  async start(buttonInteraction) {
+    this.users = await loadUsers();
     const user = this.users[this.userId];
-    if (user.jades < this.bet) {
+
+    if (!user || user.jades < this.bet) {
       activeGames.delete(this.userId);
-      await this.interaction.reply({
+      await buttonInteraction.reply({
         content:
           "You don't have enough Stellar Jades <:stellar_jade:1432377631210344530>.",
         ephemeral: true,
@@ -124,7 +126,8 @@ export class BlackjackGame {
         .setStyle(ButtonStyle.Secondary),
     );
 
-    const gameMsg = await this.interaction.followUp({
+    // Edit the message that hosted the "Deal the Cards!" button!
+    const gameMsg = await buttonInteraction.update({
       content: `Blackjack game of <@${this.userId}>`,
       embeds: [embed],
       components: [row],
@@ -153,6 +156,9 @@ export class BlackjackGame {
 
       await i.deferUpdate();
       if (this.finished) return;
+      
+      // Always fetch fresh state from disk inside collector
+      this.users = await loadUsers();
       const user = this.users[this.userId];
 
       if (i.customId === "stand") {
@@ -160,7 +166,7 @@ export class BlackjackGame {
       } else if (i.customId === "double") {
         if (user.jades < this.bet) {
           await i.followUp({
-            content: `you don't have enough stellar jades to double`,
+            content: `You don't have enough Stellar Jades to double down!`,
             ephemeral: true,
           });
           return;
@@ -244,6 +250,7 @@ export class BlackjackGame {
 
   async finishSurrender(gameMsg, refund) {
     this.cleanup();
+    this.users = await loadUsers();
     const user = this.users[this.userId];
     const tier = getTier(user.level);
     const baseGain =
@@ -297,6 +304,7 @@ export class BlackjackGame {
 
   async finish(gameMsg, dealerSafe) {
     this.cleanup();
+    this.users = await loadUsers();
     const playerVal = this.getValue(this.player);
     const dealerVal = this.getValue(this.dealer);
     const user = this.users[this.userId];
@@ -380,39 +388,48 @@ export class BlackjackGame {
 
 export async function handleBlackjackButton(interaction) {
   if (interaction.customId.startsWith("bj_start_")) {
-    const parts = interaction.customId.split("_");
-    const bet = parseInt(parts[2]);
-    const ownerId = parts[3];
+    try {
+      const parts = interaction.customId.split("_");
+      const bet = parseInt(parts[2]);
+      const ownerId = parts[3];
 
-    if (ownerId && interaction.user.id !== ownerId) {
-      return await interaction.reply({
-        content: "This isn't your game setup~ Run /blackjack to start your own!",
-        ephemeral: true,
-      });
+      if (ownerId && interaction.user.id !== ownerId) {
+        return await interaction.reply({
+          content: "This isn't your game setup~ Run /blackjack to start your own!",
+          ephemeral: true,
+        });
+      }
+
+      if (activeGames.has(interaction.user.id)) {
+        return await interaction.reply({
+          content: "You already have a game running!",
+          ephemeral: true,
+        });
+      }
+
+      const users = await loadUsers();
+      const user = users[interaction.user.id];
+
+      if (!user || user.jades < bet) {
+        return await interaction.reply({
+          content: "Not enough Jades!",
+          ephemeral: true,
+        });
+      }
+
+      activeGames.add(interaction.user.id);
+
+      const game = new BlackjackGame(interaction, interaction.user.id, bet);
+      await game.start(interaction);
+    } catch (error) {
+      console.error("Error in handleBlackjackButton:", error);
+      activeGames.delete(interaction.user.id);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: "An unexpected error occurred while starting Blackjack!",
+          ephemeral: true,
+        });
+      }
     }
-
-    if (activeGames.has(interaction.user.id)) {
-      return await interaction.reply({
-        content: "You already have a game running!",
-        ephemeral: true,
-      });
-    }
-
-    const users = await loadUsers();
-    const user = users[interaction.user.id];
-
-    if (!user || user.jades < bet) {
-      return await interaction.reply({
-        content: "Not enough Jades!",
-        ephemeral: true,
-      });
-    }
-
-    activeGames.add(interaction.user.id);
-
-    await interaction.deferUpdate();
-
-    const game = new BlackjackGame(interaction, interaction.user.id, bet);
-    await game.start();
   }
 }
