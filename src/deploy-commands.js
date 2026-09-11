@@ -19,6 +19,7 @@ import { command as blackjack } from "./commands/blackjack.js";
 // import { command as osu } from "./commands/osu.js";
 import { command as recent } from "./commands/recent.js";
 import { command as weather } from "./commands/weather.js";
+import { command as topup } from "./commands/topup.js";
 
 const commands = [
   register,
@@ -32,8 +33,9 @@ const commands = [
   blackjack,
   weather,
   inventory,
+  topup,
   // adventure,
-  // shop,
+  
 ].map((cmd) => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
