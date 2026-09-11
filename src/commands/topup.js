@@ -48,13 +48,13 @@ export async function execute(interaction) {
     saveUsers(users);
 
     const embed = new EmbedBuilder()
-      .setTitle("💎 Top-up Successful!")
+      .setTitle("<:stellar_jade:1432377631210344530> Top-up Successful!")
       .setColor("Purple")
       .setDescription(
-        `Exchanged **${totalCost.toLocaleString()}** Credits for **${requestedJades.toLocaleString()}** Stellar Jades!\n\n` +
+        `Exchanged **${totalCost.toLocaleString()}** <:credit:1432377745626759380> Credits for **${requestedJades.toLocaleString()}** Stellar Jades!\n\n` +
           `**New Balances:**\n` +
-          `• Stellar Jades: **${user.jades.toLocaleString()}**\n` +
-          `• Credits: **${user.credits.toLocaleString()}**`,
+          `• <:stellar_jade:1432377631210344530> Stellar Jades: **${user.jades.toLocaleString()}**\n` +
+          `• <:credit:1432377745626759380> Credits: **${user.credits.toLocaleString()}**`,
       )
       .setFooter({
         text: "Elysiavernight banking system",
